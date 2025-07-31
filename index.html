@@ -1,46 +1,168 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scheduled Maintenance</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-        }
-        .container {
-            text-align: center;
-            max-width: 600px;
-            padding: 20px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-        .icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>listn | landing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="icon">🔧</div>
-        <h1>Scheduled Maintenance</h1>
-        <p>We’re currently performing essential updates to enhance your experience on our site. We apologize for any inconvenience this may cause.</p>
-        <p>Please check back shortly, as we expect to be back online soon. Thank you for your understanding!</p>
-    </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>listn.dev</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="scroll-link">Home</a></li>
+            <li><a href="#services" class="scroll-link">Services</a></li>
+            <li><a href="#about" class="scroll-link">About</a></li>
+            <li><a href="#contact" class="scroll-link">Contact</a></li>
+            <li><a href="login.html" class="btn-nav btn-login">Login</a></li>
+            <li><a href="signup.html" class="btn-nav btn-signup">Sign Up</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Precision in Reverse Engineering</h1>
+            <p>Unlock the full potential of your software with our expert reverse engineering services.</p>
+            <div class="hero-buttons">
+                <a href="#signup" class="btn btn-primary scroll-link">Get Started</a>
+                <a href="#services" class="btn btn-secondary scroll-link">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <h2>Our Expertise</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <h3>Code Analysis</h3>
+                <p>In-depth analysis to uncover software functionality and optimize performance.</p>
+            </div>
+            <div class="service-card">
+                <h3>Security Auditing</h3>
+                <p>Comprehensive audits to identify and mitigate software vulnerabilities.</p>
+            </div>
+            <div class="service-card">
+                <h3>Legacy System Recovery</h3>
+                <p>Modernize and restore outdated systems with precision engineering.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <h2>About Us</h2>
+        <p>listn.dev is a leader in software reverse engineering, providing innovative solutions to help businesses unlock the potential of their technology. Our team of experts delivers precision and reliability in every project.</p>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="signup" class="cta">
+        <h2>Join Our Platform</h2>
+        <p>Sign up or log in to access our advanced reverse engineering tools and services.</p>
+        <div class="cta-buttons">
+            <a href="signup.html" class="btn btn-primary scroll-link">Sign Up</a>
+            <a href="login.html" class="btn btn-secondary scroll-link">Log In</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>listn.dev</h3>
+                <p>Delivering precision in software reverse engineering.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home" class="scroll-link">Home</a></li>
+                    <li><a href="#services" class="scroll-link">Services</a></li>
+                    <li><a href="#about" class="scroll-link">About</a></li>
+                    <li><a href="#contact" class="scroll-link">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@listn.dev</p>
+                <p>Phone: +1 (555) 123-4567</p>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2025 listn.dev. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Hamburger menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('toggle');
+        });
+
+        // Smooth scrolling for links with class 'scroll-link'
+        document.querySelectorAll('.scroll-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70, // Adjust for fixed navbar
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
